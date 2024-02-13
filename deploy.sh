@@ -18,7 +18,7 @@ else
     git clone "$REPO_URL"
     cd "$CLONE_PATH" || exit
 fi
-
+IMAGE_TAG="moex_alerts:compose_0.1.0"
 # Build the Docker image
 echo "Building the Docker image $IMAGE_TAG"
 docker build -t "$IMAGE_TAG" .
