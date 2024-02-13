@@ -12,6 +12,9 @@ services:
     volumes:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql 
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my-network
+    
 
   grafana:
     image: grafana/grafana:latest
@@ -22,6 +25,8 @@ services:
       - "3000:3000"
     depends_on:
       - postgres
+    networks:
+      - my-network
 
   app:
     build: .
@@ -32,6 +37,9 @@ services:
     depends_on:
       - postgres
       - grafana
+    networks:
+      - my-network
+
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
@@ -41,3 +49,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  my-network:
+    driver: bridge
