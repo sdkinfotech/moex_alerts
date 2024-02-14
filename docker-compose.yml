@@ -13,20 +13,20 @@ services:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql 
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - my-network
+      - vlan-1
     
 
   grafana:
     image: grafana/grafana:latest
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
     ports:
       - "3000:3000"
     depends_on:
       - postgres
     networks:
-      - my-network
+      - vlan-1
 
   app:
     build: .
@@ -38,7 +38,7 @@ services:
       - postgres
       - grafana
     networks:
-      - my-network
+      - vlan-1
 
     environment:
       DB_NAME: ${DB_NAME}
