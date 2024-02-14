@@ -13,7 +13,7 @@ services:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql 
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - vlan-1
+      - vlan1
     
 
   grafana:
@@ -26,7 +26,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - vlan-1
+      - vlan1
 
   app:
     build: .
@@ -38,7 +38,7 @@ services:
       - postgres
       - grafana
     networks:
-      - vlan-1
+      - vlan1
 
     environment:
       DB_NAME: ${DB_NAME}
