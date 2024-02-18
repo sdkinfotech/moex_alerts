@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_OS_PORT}:${DB_DOCKER_PORT}"
     volumes:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql 
       - postgres_data:/var/lib/postgresql/data
@@ -22,7 +22,7 @@ services:
       GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
     ports:
-      - "3000:3000"
+      - "${GF_OS_PORT}:${GF_DOCKER_PORT}"
     depends_on:
       - postgres
     networks:
@@ -33,7 +33,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "5000:5000"
+      - "${APP_OS_PORT}:${APP_DOCKER_PORT}"
     depends_on:
       - postgres
       - grafana
@@ -44,8 +44,8 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_DOCKER_HOST}
+      DB_PORT: ${DB_DOCKER_PORT}
 
 volumes:
   postgres_data:
