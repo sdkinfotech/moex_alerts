@@ -22,14 +22,17 @@ jobs:
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
         docker-compose -f docker-compose.yml push app
 
-    - name: Setup SSH 
-      run: |
-          set -eu
-          mkdir -p $HOME/.ssh
-          touch $HOME/.ssh/key
-          echo "${{ secrets.KEY }}" > $HOME/.ssh/key
-          chmod 600 $HOME/.ssh/key
-
-    - name: Deploy to server
-      run: |
-        ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+  - name: Setup SSH Key
+    uses: webfactory/ssh-agent@v0.5.0
+    with:
+    ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+   
+  - name: Deploy code
+    uses: appleboy/ssh-action@master
+    with:
+    host: ${{ SERVER_HOSTNAME }}
+    username: ${{ SERVER_USER }}
+    key: ${{ secrets.SSH_PRIVATE_KEY }}
+    port: ${{ SERVER_SSH_PORT }}
+    run: |
+      ls / -la
