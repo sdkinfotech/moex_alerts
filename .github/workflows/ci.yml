@@ -22,15 +22,14 @@ jobs:
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
         docker-compose -f docker-compose.yml push app
 
-    - name: Setup SSH known_hosts
+    - name: Setup SSH 
       run: |
           set -eu
           mkdir -p $HOME/.ssh
-          touch $HOME/.ssh/known_hosts
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
-          chmod 600 "$HOME/.ssh/known_hosts"
+          touch $HOME/.ssh/key
+          echo "${{ secrets.KEY }}" > $HOME/.ssh/key
+          chmod 600 $HOME/.ssh/key
 
     - name: Deploy to server
       run: |
-        ssh -i $HOME/.ssh/known_hosts -o StrictHostKeyChecking=no -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }}
-      
+        ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
