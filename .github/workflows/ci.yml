@@ -23,6 +23,9 @@ jobs:
         docker-compose -f docker-compose.yml push app
 
     # Остальные шаги для деплоя на сервер и т.д.
+    - name: Add SSH key to known_hosts
+      run: |
+         echo "${{ secrets.SERVER_SSH_HOSTS }}" >> $HOME/.ssh/known_hosts
 
     - name: Deploy to server
       run: |
