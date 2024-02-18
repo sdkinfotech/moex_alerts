@@ -32,5 +32,5 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }}
+        ssh -i $HOME/.ssh/keknown_hosts -o StrictHostKeyChecking=no -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }}
       
