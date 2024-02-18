@@ -24,11 +24,13 @@ jobs:
 
     - name: Setup SSH known_hosts
       run: |
+          set -eu
           mkdir -p $HOME/.ssh
           touch $HOME/.ssh/known_hosts
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+          chmod 600 "$HOME/.ssh/known_hosts"
 
     - name: Deploy to server
       run: |
-        ssh -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+        ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }}
       
