@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: moex_alerts
 
     steps:
     - name: Checkout repository
