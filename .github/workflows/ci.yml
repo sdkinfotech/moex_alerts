@@ -9,7 +9,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: moex_alerts
 
     steps:
     - name: Checkout repository
@@ -20,7 +19,7 @@ jobs:
 
     - name: Push Docker Images
       run: |
-        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
         docker-compose -f docker-compose.yml push app
 
     # Остальные шаги для деплоя на сервер и т.д.
