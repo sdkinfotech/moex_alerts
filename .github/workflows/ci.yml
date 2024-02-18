@@ -26,5 +26,5 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -p ${{SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+        ssh -p ${{secrets.SERVER_SSH_PORT}} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
       
