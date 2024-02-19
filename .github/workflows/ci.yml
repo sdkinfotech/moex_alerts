@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  SERVER_HOST: "${{ secrets.SERVER_HOSTNAME }}"
+  SERVER_HOST: "83.147.247.105"
   SERVER_USER: "${{ secrets.SERVER_USER }}"
   SSH_KEY: "${{ secrets.KEY }}"
   DOCKER_USER: "${{ secrets.DOCKER_USER }}"
