@@ -3,13 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+
 env:
   SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
-  SERVER_PORT: 25315  # Добавьте кастомный порт SSH здесь
+  SERVER_PORT: $ {{ SERVER_SSH_PORT}}
   SSH_KEY: ${{ secrets.KEY }}
+  SERVER_PASSWORD: $ {{ secrets.SERVER_PASSWORD }}
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -29,18 +29,19 @@ jobs:
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
           docker compose -f docker-compose.yml push app
        
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+      - name: ssh pipelines
+        uses: cross-the-world/ssh-pipeline@master
+        env:
+          WELCOME: "ssh pipeline"
         with:
-          key: $SSH_KEY
-          name: id_rsa  # Предполагаем, что ключ без пароля
-          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
-          
-      - name: Add Server Host to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p $SERVER_PORT -H $SERVER_HOST >> ~/.ssh/known_hosts
-
-      - name: Deploy to server using SSH
-        run: |
-          ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+          host: SERVER_HOST
+          user: SERVER_USER
+          pass: SERVER_PASSWORD
+          port: SERVER_PORT
+          connect_timeout: 10s
+          script: |
+            (rm -rf /home/github/test || true)
+            ls -la  
+            echo $WELCOME 
+            mkdir -p /home/github/test/test1 && 
+            mkdir -p /home/github/test/test2 &&
