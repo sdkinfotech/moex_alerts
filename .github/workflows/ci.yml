@@ -32,10 +32,10 @@ jobs:
        
       - name: Install SSH Key
         uses: appleboy/ssh-action@master
-          with:
-            host: $SERVER_HOST
-            username: $SERVER_USER
-            key: $SSH_KEY
-            port: $SERVER_PORT
-            script: | 
-              ls -la
+        with:
+          host: $SERVER_HOST
+          username: $SERVER_USER
+          key: $SSH_KEY
+          port: $SERVER_PORT
+          script: | 
+            ls -la
