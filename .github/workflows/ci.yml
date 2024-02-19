@@ -6,11 +6,11 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
-  SSH_KEY: ${{ secrets.KEY }}
-  DOCKER_USER: ${{ secrets.DOCKER_USER }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  SERVER_HOST: "${{ secrets.SERVER_HOSTNAME }}"
+  SERVER_USER: "${{ secrets.SERVER_USER }}"
+  SSH_KEY: "${{ secrets.KEY }}"
+  DOCKER_USER: "${{ secrets.DOCKER_USER }}"
+  DOCKER_PASSWORD: "${{ secrets.DOCKER_PASSWORD }}"
 
 jobs:
   build-and-deploy:
@@ -31,7 +31,7 @@ jobs:
       - name: Check remote server
         run: |
             echo "Checking SSH host availability..."
-            ping -c 3 ${{ env.SERVER_HOST }} && echo "Host is reachable."
+            ping -c 4 ${{ env.SERVER_HOST }} && echo "Host is reachable."
       
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2.3.1
