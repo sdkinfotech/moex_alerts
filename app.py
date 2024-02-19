@@ -4,6 +4,8 @@ import os
 import psycopg2
 from time import sleep
 
+temp_var = None # for test CI/CD
+
 def wait_for_db(host, port, user, password, dbname):
     conn = None
     while conn is None:
