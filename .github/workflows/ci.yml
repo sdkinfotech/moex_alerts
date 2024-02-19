@@ -42,4 +42,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd ~ && git pull'
