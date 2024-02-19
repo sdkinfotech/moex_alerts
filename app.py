@@ -26,7 +26,7 @@ def wait_for_db(host, port, user, password, dbname):
                 conn.close()
 
 def main():
-    # Загрузка переменных окружения из файла .env, если он доступен
+    
     load_dotenv()
     
     # Получение значений переменных окружения
