@@ -13,8 +13,8 @@ env:
   SSH_KEY: ${{ secrets.KEY }}
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
- jobs:
+  
+  jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
