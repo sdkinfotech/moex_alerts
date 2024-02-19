@@ -31,15 +31,11 @@ jobs:
           docker compose -f docker-compose.yml push app
        
       - name: Install SSH Key
-        uses: webfactory/ssh-agent@v0.5.0
-        with:
-          ssh-private-key: $SSH_KEY
-          
-      - name: Add Server Host to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p $SERVER_PORT -H $SERVER_HOST >> ~/.ssh/known_hosts
-
-      - name: Deploy to server using SSH
-        run: |
-          ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
+        uses: appleboy/ssh-action@master
+          with:
+            host: $SERVER_HOST
+            username: $SERVER_USER
+            key: $SSH_KEY
+            port: $SERVER_PORT
+            script: | 
+              ls -la
