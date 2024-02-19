@@ -14,7 +14,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - vlan1
-    
 
   grafana:
     image: grafana/grafana:latest
@@ -29,9 +28,12 @@ services:
       - vlan1
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/app
+      - /app/__pycache__
     ports:
       - "${APP_OS_PORT}:${APP_DOCKER_PORT}"
     depends_on:
@@ -39,7 +41,6 @@ services:
       - grafana
     networks:
       - vlan1
-
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
