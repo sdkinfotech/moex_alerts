@@ -3,11 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 env:
   SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
-  SERVER_PORT: ${{ SERVER_SSH_PORT}}
+  SERVER_PORT: ${{ secrets.SERVER_SSH_PORT }}  
   SSH_KEY: ${{ secrets.KEY }}
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -29,11 +31,9 @@ jobs:
           docker compose -f docker-compose.yml push app
        
       - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2.3.1
+        uses: webfactory/ssh-agent@v0.5.0
         with:
-          key: $SSH_KEY
-          name: id_rsa  # Предполагаем, что ключ без пароля
-          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
+          ssh-private-key: $SSH_KEY
           
       - name: Add Server Host to Known Hosts
         run: |
@@ -42,4 +42,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST 'ls -la'
+          ssh -p $SERVER_PORT $SERVER_USER@$SERVER_HOST 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
