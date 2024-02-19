@@ -42,4 +42,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd ~ && deploy.sh'
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'ls -l'
