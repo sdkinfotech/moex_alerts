@@ -31,9 +31,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - .:/app
-      - /app/__pycache__
     ports:
       - "${APP_OS_PORT}:${APP_DOCKER_PORT}"
     depends_on:
