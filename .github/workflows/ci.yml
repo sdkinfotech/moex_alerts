@@ -5,6 +5,12 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  SSH_KEY: ${{ secrets.KEY }}
+  DOCKER_USER: ${{ secrets.DOCKER_USER }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   build-and-deploy:
@@ -19,20 +25,14 @@ jobs:
 
       - name: Push Docker Images
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+          echo ${{ env.DOCKER_PASSWORD }} | docker login -u ${{ env.DOCKER_USER }} --password-stdin
           docker-compose -f docker-compose.yml push app
-
-      - name: Setup SSH Key
-        uses: webfactory/ssh-agent@v0.5.0
+      
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
         with:
-          ssh-private-key: ${{ secrets.PUBLIC_KEY }}
-
-      - name: Deploy code
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOSTNAME }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.SERVER_SSH_PORT }}
-          script: |
-            ls / -la
+          key: "${{ env.SSH_KEY }}"
+          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
+          
+      - name: Generate auth hosts
+        run: ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
