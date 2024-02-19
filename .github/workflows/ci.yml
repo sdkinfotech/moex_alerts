@@ -42,4 +42,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd ~ && rm -rf moex_alerts && git clone https://github.com/sdkinfotech/moex_alerts.git'
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} 'cd ~ && deploy.sh'
