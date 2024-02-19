@@ -1,4 +1,20 @@
-jobs:
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  SERVER_PORT: ${{ secrets.SERVER_SSH_PORT }}  
+  SSH_KEY: ${{ secrets.KEY }}
+  DOCKER_USER: ${{ secrets.DOCKER_USER }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
