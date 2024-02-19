@@ -1,19 +1,3 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-env:
-  SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
-  SERVER_PORT: ${{ secrets.SERVER_SSH_PORT }}  
-  SSH_KEY: ${{ secrets.KEY }}
-  DOCKER_USER: ${{ secrets.DOCKER_USER }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -27,15 +11,19 @@ jobs:
 
       - name: Push Docker Images
         run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
           docker compose -f docker-compose.yml push app
        
       - name: Install SSH Key
-        uses: appleboy/ssh-action@master
+        uses: webfactory/ssh-agent@v0.5.0
         with:
-          host: $SERVER_HOST
-          username: $SERVER_USER
-          key: $SSH_KEY
-          port: $SERVER_PORT
-          script: | 
-            ls -la
+          ssh-private-key: "${{ secrets.SSH_KEY }}"
+          
+      - name: Add Server Host to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.SERVER_PORT }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to server using SSH
+        run: |
+          ssh -p "${{ secrets.SERVER_PORT }}" "${{ secrets.SERVER_USER }}"@"${{ secrets.SERVER_HOST }}" 'docker-compose -f /path/to/docker-compose.yml up -d --no-deps app'
