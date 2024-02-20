@@ -4,7 +4,6 @@ import os
 import psycopg2
 from time import sleep
 
-temp_var = None # for test CI/CD
 
 def wait_for_db(host, port, user, password, dbname):
     conn = None
@@ -61,7 +60,7 @@ def main():
 
         # Пауза в 5 минут перед следующим запуском цикла
         print('Waiting for 5 minutes before the next update...')
-        sleep(300)  # 300 секунд = 5 минут
+        sleep("TIME_SLEEP")  # 300 секунд = 5 минут
 
 if __name__ == "__main__":
     main()
