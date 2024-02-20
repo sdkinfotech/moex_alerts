@@ -1,3 +1,6 @@
+# файл requirements содержит в себе все зависимые библиотеки
+# для корректной работы приложения app и других модулей
+
 requests
 psycopg2-binary
 python-dotenv
