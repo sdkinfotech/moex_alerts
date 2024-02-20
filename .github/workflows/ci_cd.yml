@@ -72,7 +72,7 @@ jobs:
       - name: Push Docker Images
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
-          docker-compose -f docker-compose.yml push app
+          docker-compose -f docker-compose.yml push sdkinfo999/moex:${{ secrets.APP_VERSION }}
 
   deploy:
     needs: docker_build_test
