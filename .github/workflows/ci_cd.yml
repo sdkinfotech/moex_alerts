@@ -37,7 +37,7 @@ jobs:
 
       - name: Create Database Tables
         run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d moex_monitoring_db -a -f ./init.db.sql
+          PGPASSWORD=postgres psql -h localhost -U postgres -d moex_monitoring_db -a -f ./init_db.sql
       
       - name: Check tables creation
         run: |
