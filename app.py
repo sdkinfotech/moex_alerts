@@ -34,9 +34,9 @@ def main():
     port = os.getenv("DB_PORT")
 
     # проверяем, не включен ли TEST_MODE режим. Он используется для тестов на пайплайне
-    TEST_MODE = os.getenv("TEST_MODE") 
+    TEST_MODE = bool(os.getenv("TEST_APP_MODE"))
     if  TEST_MODE:
-        print("WARNING! TEST MODE: Switch database connection to local")
+        print(f"TEST_MODE_STATUS: {TEST_MODE}")
         host = "localhost" # переключаемся на localhost для тестов
 
     conn = wait_for_db(host, port, user, password, dbname)
