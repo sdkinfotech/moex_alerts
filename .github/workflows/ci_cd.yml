@@ -56,7 +56,7 @@ jobs:
 
       - name: Run app.py in test mode
         run: |
-          TEST_MODE=true python app.py
+          python app.py
 
   docker_build_test:
     needs: python_app_test
@@ -86,5 +86,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          TEST_MODE=false
           ssh -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} './deploy.sh'
