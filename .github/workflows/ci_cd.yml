@@ -13,36 +13,17 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_DB: moex_monitoring_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: moex_monitoring_db
         ports:
-          - '5432:5432'
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Postgres
-        run: |
-          echo "Waiting for Postgres to be ready..."
-          until pg_isready -h localhost -p 5432 -U postgres; do
-            sleep 2
-          done
-          echo "Postgres is ready."
-
-      - name: Create Database Tables
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d moex_monitoring_db -a -f ./init_db.sql
-      
-      - name: Check tables creation
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d moex_monitoring_db -c '\dt'
-
+  
   python_app_test:
     needs: setup-db
     runs-on: ubuntu-latest
@@ -50,25 +31,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
       
-      - name: Check Python version
-        run: |
-          python --version
-          if ! python -c 'import sys; sys.exit(sys.version_info[:2] < (3, 10))'; then
-            echo "Python version is less than 3.10"
-            exit 1
-          fi
-          
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run app.py
+      - name: Run app.py in test mode
         run: |
           export TEST_MODE=true
           python app.py
@@ -81,12 +54,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker Images
-        run: docker compose -f docker-compose.yml build app
+        run: docker compose -f docker-compose.yml build
 
       - name: Push Docker Images
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
-          docker compose -f docker-compose.yml push app
+          docker compose -f docker-compose.yml push
 
   Deploy:
     needs: Docker_test
@@ -100,8 +73,8 @@ jobs:
       - name: Add Server Host to Known Hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p ${{ secrets.SERVER_PORT }} -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-
+          ssh-keyscan -p 22 -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        
       - name: Deploy to server using SSH
         run: |
-          ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} './deploy.sh'
+          ssh -p 22 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} './deploy.sh'
