@@ -4,12 +4,11 @@ import os
 import psycopg2
 from time import sleep
 
-
 def wait_for_db(host, port, user, password, dbname):
     conn = None
     while conn is None:
         try:
-            print('Connecting to the database...')
+            print(f'Connecting to the database at host {host}...')
             conn = psycopg2.connect(
                 dbname=dbname,
                 user=user,
@@ -37,43 +36,39 @@ def main():
     host = os.getenv("DB_DOCKER_HOST")
     port = os.getenv("DB_DOCKER_PORT")
     
-    # Ожидание готовности базы данных
-    wait_for_db(host, port, user, password, dbname)
+    # Check if TEST_MODE is set to 'true' in the environment variables
+    if os.getenv("TEST_MODE") == "true":
+        host = "localhost"
 
-    # Создание экземпляра класса для соединения с MOEX и получения данных TQBR
-    fetcher = MoexPriceTQBR(
-        dbname=dbname,
-        user=user,
-        password=password,
-        host=host,
-        port=port
-    )
+    # Бесконечный цикл работы приложения
+    while True:
+        # Ожидание готовности базы данных
+        wait_for_db(host, port, user, password, dbname)
 
-    # Выполнение операций с MOEX и базой данных
-    print('Fetching new prices and updating the database...')
-    fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
-    fetcher.update_db()   # Обновление базы данных из JSON
-    fetcher.show_prices() # Отображение данных в консоли из JSON
-    fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
+        # Создание экземпляра класса для соединения с MOEX и получения данных TQBR
+        fetcher = MoexPriceTQBR(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
 
-    test_mode = os.getenv("TEST_MODE")
+        # Выполнение операций с MOEX и базой данных
+        print('Fetching new prices and updating the database...')
+        fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
+        fetcher.update_db()   # Обновление базы данных из JSON
+        fetcher.show_prices() # Отображение данных в консоли из JSON
+        fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
 
-    if not test_mode:
-        # Бесконечный цикл работы приложения
-        while True:
-            # Ожидание готовности базы данных
-            wait_for_db(host, port, user, password, dbname)
+        # В режиме тестирования выполняем только один раз и затем выходим
+        if os.getenv("TEST_MODE") == "true":
+            break
 
-            # Выполнение операций с MOEX и базой данных
-            print('Fetching new prices and updating the database...')
-            fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
-            fetcher.update_db()   # Обновление базы данных из JSON
-            fetcher.show_prices() # Отображение данных в консоли из JSON
-            fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
-            
-            delay = int(os.getenv("TIME_SLEEP", "300"))
-            print(f'Waiting for {delay} seconds before the next update...')
-            sleep(delay)  # По умолчанию 300 секунд = 5 минут
+        # Пауза перед следующим запуском цикла
+        delay = int(os.getenv("TIME_SLEEP", "300"))
+        print(f'Waiting for {delay} seconds before the next update...')
+        sleep(delay)
 
 if __name__ == "__main__":
     main()
