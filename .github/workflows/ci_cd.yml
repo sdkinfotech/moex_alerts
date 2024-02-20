@@ -62,17 +62,17 @@ jobs:
     needs: python_app_test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Build Docker Images
+      - name: Build and tag Docker image
         run: |
-          docker-compose -f docker-compose.yml build app
-
-      - name: Push Docker Images
+              docker build -t sdkinfo999/moex:${{ secrets.APP_VERSION }} -f Dockerfile .
+    
+      - name: Docker Login
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
-          docker-compose -f docker-compose.yml push sdkinfo999/moex:${{ secrets.APP_VERSION }}
+                echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+      - name: Docker Push
+        run: |
+                docker push sdkinfo999/moex:${{ secrets.APP_VERSION }}
 
   deploy:
     needs: docker_build_test
