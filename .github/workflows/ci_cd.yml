@@ -13,9 +13,50 @@ env:
   SSH_KEY: ${{ secrets.KEY }}
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DB_NAME: moex_monitoring_db
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_PORT: 5432
 
 jobs:
+  setup-db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - ${{ env.DB_PORT }}:${{ env.DB_PORT }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Postgres
+        run: |
+          echo "Waiting for Postgres to be ready..."
+          until pg_isready -h localhost -p ${{ env.DB_PORT }} -U ${{ env.DB_USER }}; do
+            sleep 2
+          done
+          echo "Postgres is ready."
+
+      - name: Create Database Tables
+        run: |
+          PGPASSWORD=${{ env.DB_PASSWORD }} psql -h localhost -U ${{ env.DB_USER }} -d ${{ env.DB_NAME }} -a -f ./init.db.sql
+      
+      - name: Check tables creation
+        run: |
+          PGPASSWORD=${{ env.DB_PASSWORD }} psql -h localhost -U ${{ env.DB_USER }} -d ${{ env.DB_NAME }} -c '\dt'
+
   python_app_test:
+    needs: setup-db
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -44,8 +85,8 @@ jobs:
           python app.py
 
   Docker_test:
-    runs-on: ubuntu-latest
     needs: python_app_test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -55,23 +96,23 @@ jobs:
 
       - name: Push Docker Images
         run: |
-          echo ${{ env.DOCKER_PASSWORD }} | docker login -u ${{ env.DOCKER_USER }} --password-stdin
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
           docker compose -f docker-compose.yml push app
 
   Deploy:
-    runs-on: ubuntu-latest
     needs: Docker_test
+    runs-on: ubuntu-latest
     steps:
-        - name: Install SSH Key
-          uses: webfactory/ssh-agent@v0.5.0
-          with:
-                ssh-private-key: ${{ env.SSH_KEY }}
-                      
-        - name: Add Server Host to Known Hosts
-          run: |
-                  mkdir -p ~/.ssh
-                  ssh-keyscan -p ${{ env.SERVER_PORT }} -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
-        
-        - name: Deploy to server using SSH
-          run: | 
-                  ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} './deploy.sh'
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+              
+      - name: Add Server Host to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ env.SERVER_PORT }} -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server using SSH
+        run: |
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} './deploy.sh'
