@@ -51,7 +51,7 @@ def main():
         password=password,
         host=host,
         port=port,
-        logfile='moex_price_log.txt'  # Указываем имя файла лога
+        logfile='log.txt'  # Указываем имя файла лога
     )
     
     # Интервал обновления — периодичность запуска в секундах.
@@ -65,7 +65,6 @@ def main():
         fetcher.update_db()
         fetcher.show_prices()
         fetcher.calculate_null_prices_percentage()
-
         print(f"Sleeping for {update_interval} seconds.")
         sleep(update_interval)  # Ожидаем заданный интервал перед следующим обновлением.
     else:
