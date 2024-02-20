@@ -6,18 +6,10 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  SERVER_HOST: ${{ secrets.SERVER_HOSTNAME }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
-  SERVER_PORT: ${{ secrets.SERVER_SSH_PORT }}
-  SSH_KEY: ${{ secrets.KEY }}
-  DOCKER_USER: ${{ secrets.DOCKER_USER }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
 jobs:
-  python_app_test:
+  build-and-test:
     runs-on: ubuntu-latest
-
+    
     services:
       postgres:
         image: postgres:14
@@ -41,7 +33,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -53,13 +45,13 @@ jobs:
             sleep 2
           done
           echo "Postgres is ready."
-      
+
       - name: Run app.py in test mode
         run: |
           TEST_MODE=true python app.py
 
   Docker_test:
-    needs: python_app_test
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -82,12 +74,12 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-              
+
       - name: Add Server Host to Known Hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.SERVER_PORT }} -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-        
+
       - name: Deploy to server using SSH
         run: |
           ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} './deploy.sh'
