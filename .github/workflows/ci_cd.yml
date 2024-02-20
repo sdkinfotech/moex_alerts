@@ -56,7 +56,9 @@ jobs:
 
       - name: Run app.py in test mode
         run: |
-          TEST_MODE=true python app.py
+          TEST_MODE=true python app.
+          cat log.txt
+
 
   Docker_test:
     needs: build-and-test
@@ -81,7 +83,7 @@ jobs:
       - name: Install SSH Key
         uses: webfactory/ssh-agent@v0.5.0
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+          ssh-private-key: ${{ secrets.KEY }}
 
       - name: Add Server Host to Known Hosts
         run: |
