@@ -56,8 +56,7 @@ jobs:
 
       - name: Run app.py in test mode
         run: |
-          TEST_MODE=true python app.
-
+          TEST_MODE=true python app.py
 
   Docker_test:
     needs: build-and-test
