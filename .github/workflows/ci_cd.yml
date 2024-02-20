@@ -86,4 +86,5 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
+          TEST_MODE=false
           ssh -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} './deploy.sh'
