@@ -2,6 +2,7 @@ from parsers.moex_prices import MoexPriceTQBR
 from dotenv import load_dotenv
 import os
 from time import sleep
+import psycopg2
 
 # Функция для ожидания доступности базы данных
 def wait_for_db(host, port, user, password, dbname):
