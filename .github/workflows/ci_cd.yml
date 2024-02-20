@@ -46,6 +46,14 @@ jobs:
           done
           echo "Postgres is ready."
 
+      - name: Create Database Tables
+        run: |
+          cat ./init_db.sql | PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U ${{ secrets.DB_USER }} ${{ secrets.DB_NAME }}
+
+      - name: List tables in the database
+        run: |
+          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U ${{ secrets.DB_USER }} ${{ secrets.DB_NAME }} -c '\dt'
+
       - name: Run app.py in test mode
         run: |
           TEST_MODE=true python app.py
