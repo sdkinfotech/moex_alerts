@@ -34,8 +34,8 @@ def main():
     port = os.getenv("DB_PORT")
 
     # проверяем, не включен ли TEST_MODE режим. Он используется для тестов на пайплайне
-    TEST_MODE = bool(os.getenv("TEST_APP_MODE"))
-    if  TEST_MODE:
+    TEST_MODE = int(os.getenv("TEST_APP_MODE"))
+    if  TEST_MODE == 1:
         print(f"TEST_MODE_STATUS: {TEST_MODE}")
         host = "localhost" # переключаемся на localhost для тестов
 
@@ -59,7 +59,7 @@ def main():
     
     # Бесконечный цикл для периодического выполнения задач
     
-    while TEST_MODE == False:
+    while TEST_MODE == 0:
         print('Fetching new prices and updating the database...')
         fetcher.get_prices()
         fetcher.update_db()
