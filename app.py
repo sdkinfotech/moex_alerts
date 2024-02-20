@@ -36,32 +36,44 @@ def main():
     password = os.getenv("DB_PASSWORD")
     host = os.getenv("DB_DOCKER_HOST")
     port = os.getenv("DB_DOCKER_PORT")
+    
+    # Ожидание готовности базы данных
+    wait_for_db(host, port, user, password, dbname)
 
-    # Бесконечный цикл работы приложения
-    while True:
-        # Ожидание готовности базы данных
-        wait_for_db(host, port, user, password, dbname)
+    # Создание экземпляра класса для соединения с MOEX и получения данных TQBR
+    fetcher = MoexPriceTQBR(
+        dbname=dbname,
+        user=user,
+        password=password,
+        host=host,
+        port=port
+    )
 
-        # Создание экземпляра класса для соединения с MOEX и получения данных TQBR
-        fetcher = MoexPriceTQBR(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
+    # Выполнение операций с MOEX и базой данных
+    print('Fetching new prices and updating the database...')
+    fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
+    fetcher.update_db()   # Обновление базы данных из JSON
+    fetcher.show_prices() # Отображение данных в консоли из JSON
+    fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
 
-        # Выполнение операций с MOEX и базой данных
-        print('Fetching new prices and updating the database...')
-        fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
-        fetcher.update_db()   # Обновление базы данных из JSON
-        fetcher.show_prices() # Отображение данных в консоли из JSON
-        fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
+    test_mode = os.getenv("TEST_MODE")
 
-        # Пауза в 5 минут перед следующим запуском цикла
-        delay = os.getenv("TIME_SLEEP")
-        print('Waiting for 5 minutes before the next update...')
-        sleep(delay)  # 300 секунд = 5 минут
+    if not test_mode:
+        # Бесконечный цикл работы приложения
+        while True:
+            # Ожидание готовности базы данных
+            wait_for_db(host, port, user, password, dbname)
+
+            # Выполнение операций с MOEX и базой данных
+            print('Fetching new prices and updating the database...')
+            fetcher.get_prices()  # Запрос к MOEX и сохранение в формате JSON
+            fetcher.update_db()   # Обновление базы данных из JSON
+            fetcher.show_prices() # Отображение данных в консоли из JSON
+            fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
+            
+            delay = int(os.getenv("TIME_SLEEP", "300"))
+            print(f'Waiting for {delay} seconds before the next update...')
+            sleep(delay)  # По умолчанию 300 секунд = 5 минут
 
 if __name__ == "__main__":
     main()

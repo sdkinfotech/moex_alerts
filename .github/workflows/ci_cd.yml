@@ -70,6 +70,7 @@ jobs:
 
       - name: Run app.py
         run: |
+          export TEST_MODE=true
           python app.py
 
   Docker_test:
