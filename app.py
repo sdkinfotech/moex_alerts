@@ -35,8 +35,8 @@ def main():
 
     # проверяем, не включен ли TEST_MODE режим. Он используется для тестов на пайплайне
     TEST_MODE = int(os.getenv("TEST_APP_MODE"))
+    print(f"TEST_MODE_STATUS: {TEST_MODE}")
     if  TEST_MODE == 1:
-        print(f"TEST_MODE_STATUS: {TEST_MODE}")
         host = "localhost" # переключаемся на localhost для тестов
 
     conn = wait_for_db(host, port, user, password, dbname)
