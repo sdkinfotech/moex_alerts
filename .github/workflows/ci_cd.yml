@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-and-test:
+  python_app_test:
     runs-on: ubuntu-latest
     
     services:
@@ -58,8 +58,8 @@ jobs:
         run: |
           TEST_MODE=true python app.py
 
-  Docker_test:
-    needs: build-and-test
+  docker_build_test:
+    needs: python_app_test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -75,7 +75,7 @@ jobs:
           docker-compose -f docker-compose.yml push app
 
   deploy:
-    needs: Docker_test
+    needs: docker_build_test
     runs-on: ubuntu-latest
     steps:
       - name: Install SSH Key
