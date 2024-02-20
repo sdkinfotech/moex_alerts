@@ -59,8 +59,9 @@ def main():
         fetcher.calculate_null_prices_percentage() # Расчет процента отсутствующих цен
 
         # Пауза в 5 минут перед следующим запуском цикла
+        delay = os.getenv("TIME_SLEEP")
         print('Waiting for 5 minutes before the next update...')
-        sleep("TIME_SLEEP")  # 300 секунд = 5 минут
+        sleep(delay)  # 300 секунд = 5 минут
 
 if __name__ == "__main__":
     main()
