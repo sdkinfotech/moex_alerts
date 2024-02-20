@@ -57,7 +57,6 @@ jobs:
       - name: Run app.py in test mode
         run: |
           TEST_MODE=true python app.
-          cat log.txt
 
 
   Docker_test:
