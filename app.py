@@ -33,8 +33,11 @@ def main():
     host = os.getenv("DB_HOST")  # Используйте DB_HOST, если нет специального ключа для docker
     port = os.getenv("DB_PORT")
 
-    if os.getenv("TEST_MODE") == "true":
-        host = "localhost"
+    # проверяем, не включен ли TEST_MODE режим. Он используется для тестов на пайплайне
+    TEST_MODE = os.getenv("TEST_MODE") 
+    if  TEST_MODE:
+        print("WARNING! TEST MODE: Switch database connection to local")
+        host = "localhost" # переключаемся на localhost для тестов
 
     conn = wait_for_db(host, port, user, password, dbname)
     if conn is None:
@@ -55,7 +58,8 @@ def main():
     update_interval = int(os.getenv("TIME_SLEEP"))
     
     # Бесконечный цикл для периодического выполнения задач
-    while True:
+    
+    while TEST_MODE == False:
         print('Fetching new prices and updating the database...')
         fetcher.get_prices()
         fetcher.update_db()
@@ -64,6 +68,14 @@ def main():
 
         print(f"Sleeping for {update_interval} seconds.")
         sleep(update_interval)  # Ожидаем заданный интервал перед следующим обновлением.
+    else:
+        # Тестовый режим - исполняем код один раз
+        print("WARNING! TEST MODE ON")
+        print('Running in test mode (one-time execution)...')
+        fetcher.get_prices()
+        fetcher.update_db()
+        fetcher.show_prices()
+        fetcher.calculate_null_prices_percentage()
 
 if __name__ == "__main__":
     main()
