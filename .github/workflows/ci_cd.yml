@@ -90,4 +90,4 @@ jobs:
 
       - name: Deploy to server using SSH
         run: |
-          ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} './deploy.sh'
+          ssh -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} './deploy.sh'
