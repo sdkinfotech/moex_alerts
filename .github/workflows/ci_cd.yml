@@ -84,6 +84,6 @@ jobs:
           ssh-keyscan -p ${{ secrets.SERVER_SSH_PORT }} -H ${{ secrets.SERVER_HOSTNAME }} >> ~/.ssh/known_hosts
 
 
-      - name: Deploy to server using SSH
-        run: |
-          ssh -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} './deploy.sh'
+      #- name: Deploy to server using SSH
+      #  run: |
+      #    ssh -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOSTNAME }} './deploy.sh'
